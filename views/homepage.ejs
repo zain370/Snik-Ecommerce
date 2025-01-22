@@ -1,0 +1,330 @@
+<div class="component-two-hero">
+    <div class="container">
+        <h2 class="hero-title">
+            New Summer<br> <strong style="font-weight: 700;">Shoes Collection</strong>
+        </h2>
+
+        <a class="btn btn-primary hero-btn-text" href="#">
+            <span class="">Shop Now</span>
+            <i class=" bi bi-arrow-right-short"></i>
+        </a>
+    </div>
+</div>
+
+
+<div class="component-three-collection">
+    <h3 class="section-heading" id="category-section">CATEGORIES</h3>
+
+    <div class="container container-flex ">
+
+        <div class="collection-card " style="background-image: url('./Assets/collection-1.jpg');">
+            <h3 class="card-title">MEN COLLECTION</h3>
+            <a href="/men-collection" class="btn btn-secondary collection-btn collection-btn1-hover">
+                <span class="collection-explore">Explore All</span>
+                <img src="./Assets/arrow-right-solid.svg" class="collection-right-arrow" alt="">
+            </a>
+        </div>
+
+        <div class="collection-card" style="background-image: url('./Assets/collection-2.jpg');">
+            <h3 class="card-title">WOMEN COLLECTION</h3>
+            <a href="/women-collection" class="btn btn-secondary collection-btn collection-btn2-hover">
+                <span class="collection-explore">Explore All</span>
+                <img src="./Assets/arrow-right-solid.svg" class="collection-right-arrow" alt="">
+            </a>
+        </div>
+
+        <div class="collection-card" style="background-image: url('./Assets/collection-3.jpg');">
+            <h3 class="card-title">SPORTS COLLECTION</h3>
+            <a href="/sports-collection" class="btn btn-secondary collection-btn collection-btn2-hover">
+                <span class="collection-explore">Explore All</span>
+                <img src="./Assets/arrow-right-solid.svg" class="collection-right-arrow" alt="">
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="component-four-top-selling">
+    <h3 class="section-heading">FEATURED PRODUCTS</h3>
+    
+ 
+
+    <div class="container">
+        <div class="product-list">
+            <% if (featuredProducts && featuredProducts.length > 0) { %>
+                <% featuredProducts.forEach(product => { %>
+                    <a href="/view-product/<%= product._id %>" class="product-link">
+                        <div class="product-card" data-product-id="<%= product._id %>">
+                            <figure class="card-banner <%= product.stock === 0 ? 'out-of-stock-opacity' : '' %>">
+                                <img src="<%= product.image %>" width="312" height="350" loading="lazy" alt="<%= product.name %>" class="image-contain">
+                                <% if (product.stock === 0) { %>
+                                    <div class="card-badge out-of-stock" style="width: 100px;">Out of Stock</div>
+                                <% } else { %>
+                                    <div class="card-badge">New</div>
+                                <% } %>
+                                <ul class="card-action-list">
+                                    <li class="card-action-item">
+                                        <button class="card-action-btn" aria-labelledby="card-label-1" <%= product.stock === 0 ? 'disabled' : '' %>>
+                                            <img src="/Assets/cart.svg" alt="">
+                                        </button>
+                                        <div class="card-action-tooltip" id="card-label-1">Add to Cart</div>
+                                    </li>
+                                </ul>
+                            </figure>
+                            <div class="card-content">
+                                <h3 class="card-title">
+                                    <%= product.name %>
+                                </h3>
+                                <data class="card-price" value="<%= product.price %>">Rs <%= product.price %></data>
+                            </div>
+                        </div>
+                    </a>
+                <% }); %>
+            <% } else { %>
+                <p>No products found.</p>
+            <% } %>
+        </div>
+    </div>
+
+</div>
+
+<div class="component-four-top-selling">
+    <h3 class="section-heading">TOP SELLING </h3>
+       <!-- Search Form -->
+       <form class="search-form" action="/" method="get">
+        <input type="text" name="query" id="search-bar" placeholder="Search for products..." autocomplete="off" value="<%= searchQuery %>">
+        <button type="submit" class="search-icon-btn"><i class="bi bi-search"></i></button>
+        
+        <!-- Previous Searches Dropdown -->
+        <div class="previous-searches-dropdown" id="previous-searches-dropdown">
+            <ul>
+                <% if (previousSearches && previousSearches.length > 0) { %>
+                    <% previousSearches.forEach(search => { %>
+                        <li><a href="/?query=<%= search %>"><%= search %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No previous searches</li>
+                <% } %>
+            </ul>
+        </div>
+    </form>
+    
+    <div class="container">
+        <div class="product-list">
+            <% if (allProducts && allProducts.length > 0) { %>
+                <% allProducts.forEach(product => { %>
+                    <a href="/view-product/<%= product._id %>" class="product-link">
+                        <div class="product-card" data-product-id="<%= product._id %>">
+                            <figure class="card-banner <%= product.stock === 0 ? 'out-of-stock-opacity' : '' %>">
+                                <img src="<%= product.image %>" width="312" height="350" loading="lazy" alt="<%= product.name %>" class="image-contain">
+                                <% if (product.stock === 0) { %>
+                                    <div class="card-badge out-of-stock" style="width: 100px;">Out of Stock</div>
+                                <% } else { %>
+                                    <div class="card-badge">New</div>
+                                <% } %>
+                                <ul class="card-action-list">
+                                    <li class="card-action-item">
+                                        <button class="card-action-btn" aria-labelledby="card-label-1" <%= product.stock === 0 ? 'disabled' : '' %>>
+                                            <img src="/Assets/cart.svg" alt="">
+                                        </button>
+                                        <div class="card-action-tooltip" id="card-label-1">Add to Cart</div>
+                                    </li>
+                                </ul>
+                            </figure>
+                            <div class="card-content">
+                                <h3 class="card-title">
+                                    <%= product.name %>
+                                </h3>
+                                <data class="card-price" value="<%= product.price %>">Rs <%= product.price %></data>
+                            </div>
+                        </div>
+                    </a>
+                <% }); %>
+            <% } else { %>
+                <p>No products found.</p>
+            <% } %>
+        </div>
+    </div>
+    <div class="pagination">
+        <% if (pageNumber > 1) { %>
+            <a href="/?query=<%= searchQuery %>&page=<%= pageNumber - 1 %>" class="prev-page">&laquo; Previous</a>
+        <% } else { %>
+            <span class="disabled">&laquo; Previous</span>
+        <% } %>
+        <span class="current-page">Page <%= pageNumber %></span>
+        <% if (pageNumber * limit < allProductCount) { %>
+            <a href="/?query=<%= searchQuery %>&page=<%= pageNumber + 1 %>" class="next-page">Next &raquo;</a>
+        <% } else { %>
+            <span class="disabled">Next &raquo;</span>
+        <% } %>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-heading" >BRAND SPONSORS </div>
+<div class="component-seven-brands container">
+    
+
+    <img src="./Assets/sponsor-1.png" class="sponsor-img">
+    <img src="./Assets/sponsor-2.png" class="sponsor-img">
+    <img src="./Assets/sponsor-3.png" class="sponsor-img">
+    <img src="./Assets/sponsor-4.png" class="sponsor-img">
+    <img src="./Assets/sponsor-5.png" class="sponsor-img">
+</div>
+
+<div class="component-five-offer-cards container">
+    <div class="offer-card-1 " style="background-image: url('./Assets/cta-1.jpg');">
+        <h4 class="offer-brand-name">Addidas Shoe</h4>
+        <span class="offer-sale-text">The Summer Sale <br>Off 50% </span>
+        <a href="#" class="btn btn-primary">
+            <span class="underline-btn">Shop Now</span>
+            <i class=" bi bi-arrow-right-short"></i>
+        </a>
+    </div>
+
+    <div class="offer-card-1 " style="background-image: url('./Assets/cta-2.jpg');">
+        <h4 class="offer-brand-name">Nike Shoe</h4>
+        <span class="offer-sale-text">Make Yourself <br>Keep Sporty </span>
+        <a href="#" class="btn btn-primary">
+            <span class="underline-btn">Shop Now</span>
+            <i class=" bi bi-arrow-right-short"></i>
+        </a>
+    </div>
+
+</div>
+
+<div class="component-six-services container ">
+
+    <div class="row">
+        <div class="col-lg-3 col-6 d-flex align-text-center align-items-center my-3">
+            <div class="service-icons">
+                <img src="./Assets/service-1.png " class="service-png">
+            </div>
+            <div class="service-content mx-2">
+                <div class="service-name">FREE SHIPING</div>
+                <div class="service-desc">All orders over Rs.5,000</div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3 col-6 d-flex align-text-center align-items-center my-3">
+            <div class="service-icons">
+                <img src="./Assets/service-2.png" class="service-png">
+            </div>
+            <div class="service-content mx-2">
+                <div class="service-name">QUICK PAYMENT</div>
+                <div class="service-desc">100% secure payment</div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-3 col-6 d-flex align-text-center align-items-center">
+            <div class="service-icons">
+                <img src="./Assets/service-3.png" class="service-png">
+            </div>
+            <div class="service-content mx-2">
+                <div class="service-name">FREE RETURNS</div>
+                <div class="service-desc">Money back in 30 days</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6 d-flex align-text-center align-items-center">
+            <div class="service-icons">
+                <img src="./Assets/service-4.png" class="service-png">
+            </div>
+            <div class="service-content mx-2">
+                <div class="service-name">24/7 SUPPORT</div>
+                <div class="service-desc">Get quick support</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+
+
+</style>
+
+<script>
+    document.querySelectorAll('.card-action-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const productCard = this.closest('.product-card');
+            const productId = productCard.dataset.productId;
+
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ productId: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartCount();
+                    alert(`${data.productName} has been added to the cart successfully`);
+                } else {
+                    alert('Failed to add product to cart: ' + data.message);
+                    console.log(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Please login to add product to cart');
+            });
+        });
+    });
+
+    function updateCartCount() {
+        fetch('/cart/count')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.cart-badge').textContent = data.count;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', updateCartCount);
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    const $searchBar = $('#search-bar');
+    const $dropdown = $('#previous-searches-dropdown');
+
+    $searchBar.on('focus', function() {
+        if ($dropdown.find('ul').children().length > 0) {
+            $dropdown.show();
+        }
+    });
+
+    $(document).on('click', function(event) {
+        if (!$searchBar.is(event.target) && !$dropdown.is(event.target) && $dropdown.has(event.target).length === 0) {
+            $dropdown.hide();
+        }
+    });
+});
+</script>

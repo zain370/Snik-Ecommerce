@@ -1,0 +1,348 @@
+<div class="main-add-pro" id="top-add-pro">
+  <div class="d-flex justify-content-center align-items-center mb-4">
+    <div class="admin-form m-3">
+      <h1 class="mb-4">Add New Shoe</h1>
+      <form action="/api/products" method="POST" id="add-form">
+
+        <div class="myformflex">
+          <div class="formflex-left">
+            <div class="mb-2 add-p-field">
+              <label for="name" class="form-label">Name:</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <!-- <div class="mb-2 add-p-field">
+                      <label for="sku" class="form-label">SKU:</label>
+                      <input type="text" class="form-control" id="sku" name="sku" required>
+                  </div> -->
+            <div class="mb-2 add-p-field">
+              <label for="price" class="form-label">Price:</label>
+              <input type="number" class="form-control" id="price" name="price" required>
+            </div>
+          </div>
+          <div class="formflex-right">
+            <div class="mb-2 add-p-field">
+              <label for="stock" class="form-label">Stock:</label>
+              <input type="number" class="form-control" id="stock" name="stock" required>
+            </div>
+            <div class="mb-2 add-p-field" >
+                  <label for=" category" class="form-label">Category:</label>
+              <select id="category" class="add-p-field" name="category">
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="sports">Sports</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="mb-2 add-p-field-url " >
+          <label for="price" class="form-label">Image URL:</label>
+          <input type="text" class="form-control" id="image" name="image" required>
+        </div>
+
+        <div class="mb-2 add-p-field-url">
+          <label for="description" class="form-label">Description:</label>
+          <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+        </div>
+
+
+        <idv class="form-btns">
+          <button type="submit" class="btn btn-primary add-p-btn" id="addProductBtn">Add Product</button>
+        <button type="button" class="btn btn-primary add-p-btn" id="editProductBtn" style="display: none;">Edit
+          Product</button>
+        </idv>
+      </form>
+    </div>
+
+  </div>
+
+
+
+
+
+
+  <div class="container mt-4">
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr class="table-dark text-center">
+            <th>Image</th>
+            <th>Name</th>
+            <!-- <th>SKU</th> -->
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Category</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="productTableBody">
+          <!-- Products will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    var editProductId = null;
+
+    // Initially disable the Edit Product button and show the Add Product button
+    $('#editProductBtn').prop('disabled', true);
+    $('#addProductBtn').show();
+
+    // Function to populate form with product data for editing
+    function populateFormForEdit(product) {
+      $('#name').val(product.name);
+      // $('#sku').val(product.sku);
+      $('#price').val(product.price);
+      $('#stock').val(product.stock);
+      $('#category').val(product.category);
+      $('#image').val(product.image);
+      $('#description').val(product.description);
+      $('#addProductBtn').hide();  // Hide Add Product button
+      $('#editProductBtn').prop('disabled', false);  // Enable Edit Product button
+      // Scroll to the top of the form
+      $('html, body').animate({
+        scrollTop: $('#top-add-pro').offset().top
+      }, 'slow');
+    }
+
+    // Fetch products and populate the table
+    $.ajax({
+      url: 'http://localhost:8000/api/products',
+      method: 'GET',
+      success: function (response) {
+        var products = response;
+        var tableBody = $('#productTableBody');
+
+        // Loop through each product
+        $.each(products, function (index, product) {
+          // Create a new row for each product
+          var newRow = $('<tr>');
+
+          // Populate cells with product data
+          newRow.append('<td class="text-center align-middle"><img src="' + product.image + '" alt="' + product.name + '" style="max-width: 100px; max-height: 100px;"></td>');
+          newRow.append('<td class="text-center align-middle">' + product.name + '</td>');
+          // newRow.append('<td class="text-center">' + product.sku + '</td>');
+          newRow.append('<td class="text-center align-middle">' + product.price + '</td>');
+          newRow.append('<td class="text-center align-middle">' + product.stock + '</td>');
+          newRow.append('<td class="text-center align-middle">' + product.category + '</td>');
+
+          // Add action icons with click event listener
+          var actionColumn = $('<td class="text-center align-middle">');
+          var editIcon = $('<i class="bi bi-pencil-square"></i>').click(function () {
+            editProductId = product._id;
+            populateFormForEdit(product);
+            $('#addProductBtn').prop('disabled', true);
+          });
+          var deleteIcon = $('<i class="bi bi-trash3"></i>').click(function () {
+            deleteProduct(product._id, product.name, newRow);
+          });
+          actionColumn.append(editIcon).append(' ').append(deleteIcon);
+          newRow.append(actionColumn);
+
+          // Append the new row to the table body
+          tableBody.append(newRow);
+        });
+      },
+      error: function (xhr, status, error) {
+        console.error(xhr.responseText);
+      }
+    });
+
+    // Prevent form submission
+    $('#add-form').submit(function (event) {
+      event.preventDefault();
+    });
+
+    // Add Product Button Click Event
+    $('#addProductBtn').off('click').on('click', function () {
+      // Create a new product with form data
+      var newProduct = {
+        name: $('#name').val(),
+        // sku: $('#sku').val(),
+        price: $('#price').val(),
+        stock: $('#stock').val(),
+        category: $('#category').val(),
+        image: $('#image').val(),
+        description: $('#description').val()
+      };
+
+      $.ajax({
+        url: 'http://localhost:8000/api/products',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(newProduct),
+        success: function (response) {
+          // Show success alert
+          alert('Product added successfully to the database.');
+          // Reset the form
+          $('#add-form')[0].reset();
+          // Refresh the table
+          location.reload();
+        },
+        error: function (xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    });
+
+    // Edit Product Button Click Event
+    $('#editProductBtn').off('click').on('click', function () {
+      // Update the product with edited data
+      var editedProduct = {
+        name: $('#name').val(),
+        // sku: $('#sku').val(),
+        price: $('#price').val(),
+        stock: $('#stock').val(),
+        category: $('#category').val(),
+        image: $('#image').val(),
+        description: $('#description').val()
+      };
+
+      $.ajax({
+        url: 'http://localhost:8000/api/products/' + editProductId,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(editedProduct),
+        success: function (response) {
+          // Show success alert
+          alert('Product edited successfully.');
+          // Reset the form
+          $('#add-form')[0].reset();
+          $('#addProductBtn').show();  // Show Add Product button
+          $('#editProductBtn').prop('disabled', true);  // Disable Edit Product button
+          // Refresh the table
+          location.reload();
+        },
+        error: function (xhr, status, error) {
+          console.error(xhr.responseText);
+        }
+      });
+    });
+
+    // Function to delete a product
+    function deleteProduct(productId, productName, row) {
+      if (confirm(`Are you sure you want to delete ${productName}?`)) {
+        $.ajax({
+          url: 'http://localhost:8000/api/products/' + productId,
+          method: 'DELETE',
+          success: function (response) {
+            row.remove();
+          },
+          error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+          }
+        });
+      }
+    }
+  });
+</script>
+
+
+
+
+
+
+
+
+<style>
+  #addProductBtn{
+    margin-left: 90px !important;
+  }
+  #editProductBtn{
+    margin-right: -40px !important;
+  }
+
+  .form-btns{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 800px;
+  }
+    .add-p-field-url {
+      margin-top: 7px;
+    width: 840px !important;
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+
+  }
+  #image, #description{
+    width: 750px !important; ;
+  }
+
+  #description{
+    height: 150px;
+  }
+  .myformflex{
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .formflex-left{
+    margin-right: 50px !important;
+  }
+  .main-add-pro {
+    background-color: #e5e5fa;
+
+    background-image: radial-gradient(#5b62e6 1.05px, #e5e5fa 1.05px);
+
+  }
+
+  .admin-form {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80% !important;
+    flex-direction: column;
+    background-color: rgb(150, 220, 253);
+    border-radius: 15px;
+    margin-top: 30px !important;
+    height: 500px !important;
+  }
+
+  .add-p-field {
+    width: 385px !important;
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+
+  }
+
+
+  .add-p-btn {
+    width: 300px !important;
+    background-color: rgb(29, 74, 117) !important;
+    height: 40px;
+    margin-top: 20px;
+  }
+
+  #category {
+    width: 300px !important;
+    height: 40px;
+    border-radius: 3px;
+    border: none;
+    outline: none;
+    /* Removes the default outline */
+    padding: 10px;
+    /* Adds padding inside the dropdown */
+    font-size: 16px;
+    /* Sets the font size */
+  }
+
+  .form-label {
+    width: 100ox !important;
+  }
+
+  .form-control {
+    width: 300px !important;
+  }
+</style>

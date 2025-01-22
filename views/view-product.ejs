@@ -1,0 +1,383 @@
+<div class="container">
+  <div class="row">
+    <div class="col-2">
+      <img src="<%= product.image %>" id="emphasisPicture">
+      
+    </div>
+    <div class="col-2">
+      <small class="companyName">
+        <%= product.category %>
+      </small>
+      <h2 class="pro-name-view">
+        <%= product.name %>
+      </h2>
+      <p class="pro-description">
+        <%= product.description %>
+      </p>
+      <div class="price">
+        <span class="productValue">Rs <%= product.price %></span>
+      </div>
+      <% if (product.stock===0) { %>
+        <div class="out-of-stock-message">Out of Stock</div>
+        <% } %>
+      <div class="buttonsRow">
+        <div class="callToAction" id="callToAction">
+          <button id="btn" <%=product.stock===0 ? 'disabled' : '' %>>
+            <i class="fa-solid fa-cart-shopping"></i> Add to cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('callToAction').addEventListener('click', async () => {
+      const productId = '<%= product._id %>';
+      try {
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ productId })
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert(`${result.productName} has been added to the cart successfully`);
+          updateCartCount();
+        } else {
+          alert('Failed to add product to cart: ' + result.message);
+        }
+      } catch (error) {
+        console.error('Error adding product to cart:', error);
+        alert('Please login to add product to cart');
+      }
+    });
+  });
+
+  async function updateCartCount() {
+    try {
+      const response = await fetch('/cart/count');
+      const result = await response.json();
+      document.querySelector('.cart-badge').textContent = result.count;
+    } catch (error) {
+      console.error('Error fetching cart count:', error);
+    }
+  }
+</script>
+
+
+
+<style>
+  .out-of-stock-message {
+    background-color: #ff0000;
+    color: white;
+    padding: 5px;
+    font-size: 16px;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    width: 160px;
+    font-family: 'Josefin Sans', sans-serif;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+
+
+  :root {
+
+    /* font family */
+    --kumbhFont: 'Josefin Sans', sans-serif;
+
+
+    /* font weight */
+    --regular: 400;
+    --bold: 700;
+
+    /* font-size */
+    --heading: 48.83px;
+    --subHeading: 39.06px --h3Heading: 31.25px --paragraph: 16px;
+
+    /* colors */
+
+    /* primary */
+    --orange: #52BAFF;
+    --paleOrange: hsl(25, 100%, 94%);
+
+  }
+
+  /* body */
+
+
+  /* navbar */
+
+
+  /* container */
+
+  .container {
+    max-width: 1080px;
+    margin: 60px auto;
+  }
+
+  /* row */
+
+  .row {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 5%;
+    padding: 0 25px;
+  }
+
+  /* col-2 */
+
+  .col-2 {
+    flex-basis: 40%;
+    min-width: 300px;
+  }
+
+  .col-2 #emphasisPicture {
+    margin-top: 85px;
+    max-width: 100%;
+    border-radius: 7px;
+    cursor: pointer;
+  }
+
+  /* col-4 */
+
+  .pro-description {
+    text-align: justify;
+    line-height: 20px !important;
+    font-family: 'Josefin Sans', sans-serif;
+  }
+
+  /* col-2 product description */
+
+  .col-2 .companyName {
+    display: block;
+    font-size: var(--h3Heading);
+    color: var(--orange);
+    font-weight: var(--bold);
+    letter-spacing: 0.1em;
+    margin-top: 80px;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+  }
+
+  .col-2 h2 {
+    font-size: var(--heading);
+    font-weight: var(--bold);
+    line-height: 58px;
+    margin-bottom: 30px;
+  }
+
+  .col-2 p {
+    font-size: var(--paragraph);
+    color: hsl(219, 9%, 45%);
+    font-weight: var(--regular);
+    line-height: 25.6px;
+  }
+
+  .col-2 .price {
+    display: flex;
+    margin: 16px 0 5px;
+    align-items: center;
+  }
+
+  .col-2 .price .productValue {
+    display: block;
+    font-weight: var(--bold);
+    font-size: 25px;
+    margin-right: 12px;
+  }
+
+  .col-2 .price .percentage {
+    display: block;
+    padding: 5px;
+    background: var(--paleOrange);
+    color: var(--orange);
+    border-radius: 7px;
+  }
+
+  .col-2 .totalValue {
+    display: block;
+    text-decoration: line-through;
+    color: hsl(220, 14%, 75%);
+    font-size: 14px;
+  }
+
+  /* buttonsRow */
+
+  .col-2 .buttonsRow {
+    margin-left: -30px !important;
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+
+
+  /* call to action */
+
+  .col-2 .buttonsRow .callToAction {
+    position: relative;
+    margin-left: -10.5rem;
+  }
+
+  .col-2 .buttonsRow .callToAction button {
+    border: none;
+    background: var(--orange);
+    color: #fff;
+    padding: 15px 22px;
+    cursor: pointer;
+    border-radius: 7px;
+    font-weight: var(--bold);
+    text-align: center;
+    width: 160px !important;
+  }
+
+  .col-2 .buttonsRow .callToAction button i {
+    margin-right: 7px;
+  }
+
+  .col-2 .buttonsRow .callToAction button:hover {
+    opacity: 0.6;
+  }
+
+
+
+  @media (max-width: 600px) {
+
+
+    /* container */
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 5%;
+      padding: 0;
+      flex-direction: column;
+    }
+
+    .col-2 {
+      flex-basis: 100%;
+      min-width: 300px;
+    }
+
+    .col-2 #emphasisPicture {
+      max-width: 100%;
+      border-radius: 0px;
+      cursor: default;
+      display: none;
+
+    }
+
+    .smallImg {
+      display: none;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* col-2 info */
+
+    .col-2:nth-child(2) {
+      padding: 0 25px;
+    }
+
+    .col-2 .companyName {
+      margin-top: 30px;
+      margin-bottom: 7px;
+
+    }
+
+    .col-2 .price {
+      display: flex;
+      margin: 16px 0 5px;
+      align-items: center;
+    }
+
+    .col-2 .price .productValue {
+      display: block;
+      font-weight: var(--bold);
+      font-size: 25px;
+      margin-right: 12px;
+    }
+
+    .col-2 .price .percentage {
+      display: block;
+      padding: 5px;
+      background: var(--paleOrange);
+      color: var(--orange);
+      border-radius: 7px;
+    }
+
+    .col-2 .totalValue {
+      display: block;
+      text-decoration: line-through;
+      color: hsl(220, 14%, 75%);
+      font-size: 14px;
+    }
+
+    /* buttonsRow */
+
+    .col-2 .buttonsRow {
+      flex-direction: column;
+      width: 100%;
+      margin-bottom: 10%;
+    }
+
+
+
+    /* call to action */
+
+    .col-2 .buttonsRow .callToAction {
+      position: relative;
+      width: 100%;
+      text-align: center;
+    }
+
+    .col-2 .buttonsRow .callToAction button {
+      padding: 15px;
+      width: 95%;
+    }
+
+    .col-2 .buttonsRow .callToAction button i {
+      margin-right: 7px;
+    }
+
+    .col-2 .buttonsRow .callToAction button:hover {
+      opacity: 0.6;
+    }
+
+    /* carousel */
+  }
+</style>

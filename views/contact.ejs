@@ -1,0 +1,114 @@
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+<div class="component-contact-page  ">
+
+    <div class="contact-div container">
+
+        <div class="contact-left">
+            <div class="contact-text">
+                Get in Touch
+            </div>
+
+            <div class=" social-row">
+                <i class="bi bi-envelope-fill custom-envelope"></i>
+                <div class="socila-text">contact@snik.com</div>
+            </div>
+
+            <div class=" social-row">
+
+                <i class="bi bi-telephone-fill custom-envelope"></i>
+                <div class="socila-text">+92 300 123 4567</div>
+            </div>
+
+            <div class=" social-row">
+
+                <i class="bi bi-geo-alt-fill custom-envelope"></i>
+                <div class="socila-text">Lahore, Pakistan</div>
+            </div>
+
+            <div class=" social-row">
+
+                <i class="bi bi-messenger custom-envelope"></i>
+                <div class="socila-text">Snik Official</div>
+            </div>
+
+
+
+
+        </div>
+
+
+
+
+        <div class="contact-right">
+
+            <form action="/send" method="post" class="form-div" id="myform">
+                <div class="write-us-text">Write Us</div>
+                <div class="form-group">
+                    <input type="text" id="name" name="name" placeholder="Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" name="message" required placeholder="Message"></textarea>
+                </div>
+
+                <div class="form-group" id="submit-btn-wrapper">
+                    <input type="submit" value="Send Message" id="submit-btn">
+                </div>
+                <div id="message-display"></div>
+            </form>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+
+    $("#myform").validate({
+        rules: {
+            name: {
+                minlength: 3,
+                lettersOnly: true // Custom validation method for allowing only alphabetical characters
+            },
+            email: {
+                email: true
+            }
+        },
+        messages: {
+            name: {
+                required: "Please enter your name",
+                minlength: "Name should be at least 3 characters",
+                lettersOnly: "Please enter only alphabetical characters"
+            },
+            email: "Please enter your email"
+        },
+        submitHandler: function (mailForm) {
+            $.ajax({
+                url: mailForm.action,
+                type: mailForm.method,
+                data: $(mailForm).serialize(),
+                success: function (response) {
+                    $("#message-display").html("Thanks! Your message has been sent.");
+                    $("#submit-btn-wrapper").hide(); // Hide the submit button wrapper
+                    $(mailForm)[0].reset();
+                }
+            });
+        }
+    });
+
+    // Custom validation method for allowing only alphabetical characters
+    $.validator.addMethod("lettersOnly", function (value, element) {
+        return this.optional(element) || /^[A-Za-z]+$/.test(value);
+    }, "Please enter only alphabetical characters.");
+
+</script>

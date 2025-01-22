@@ -1,0 +1,41 @@
+<div class="component-four-top-selling-category">
+    <h3 class="section-heading">Visited Products</h3>
+    <div class="container">
+        <div class="product-list">
+            <% if (visitedProducts && visitedProducts.length > 0) { %>
+                <% visitedProducts.forEach(product => { %>
+                    <div class="product-card" data-product-id="<%= product._id %>">
+                        <figure class="card-banner <%= product.stock === 0 ? 'out-of-stock-opacity' : '' %>">
+                            <img src="<%= product.image %>" width="312" height="350" loading="lazy"
+                                alt="<%= product.name %>" class="image-contain">
+                            <% if (product.stock === 0) { %>
+                                <div class="card-badge out-of-stock">Out of Stock</div>
+                            <% } else { %>
+                                <div class="card-badge">New</div>
+                            <% } %>
+                            <ul class="card-action-list">
+                                <li class="card-action-item">
+                                    <button class="card-action-btn"
+                                        aria-labelledby="card-label-<%= product._id %>" <%= product.stock === 0 ? 'disabled' : '' %>>
+                                        <img src="/Assets/cart.svg" alt="">
+                                    </button>
+                                    <div class="card-action-tooltip" id="card-label-<%= product._id %>">Add to Cart</div>
+                                </li>
+                            </ul>
+                        </figure>
+                        <div class="card-content">
+                            <h3 class="card-title">
+                                <a href="/view-product/<%= product._id %>" id="product-link">
+                                    <%= product.name %>
+                                </a>
+                            </h3>
+                            <data class="card-price" value="<%= product.price %>">Rs <%= product.price %></data>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No visited products found.</p>
+            <% } %>
+        </div>
+    </div>
+</div>

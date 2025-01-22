@@ -1,0 +1,315 @@
+<div class="container my-3">
+    <div class="checkout-heading">Checkout</div>
+    <!-- Cart items table -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" class="align-middle text-center">Image</th>
+                <th scope="col" class="align-middle text-center">Product Name</th>
+                <th scope="col" class="align-middle text-center">Unit Price</th>
+                <th scope="col" class="align-middle text-center">Quantity</th>
+                <th scope="col" class="align-middle text-center">Remove Item</th>
+                <th scope="col" class="align-middle text-center">Total Price</th>
+            </tr>
+        </thead>
+        <tbody id="cartItems">
+            <% cartItems.forEach(item=> { %>
+                <tr data-product-id="<%= item.productId._id %>">
+                    <td class="align-middle text-center"><img src="<%= item.productId.image %>" width="50"
+                            height="50" /></td>
+                    <td class="align-middle text-center">
+                        <%= item.productId.name %>
+                    </td>
+                    <td class="align-middle text-center">Rs <%= item.productId.price %>
+                    </td>
+                    <td class="align-middle text-center">
+                        <!-- Editable quantity input -->
+                        <input type="number" class="quantity-input" value="<%= item.quantity %>" min="1"
+                            data-product-id="<%= item.productId._id %>">
+                    </td>
+                    <td class="align-middle text-center">
+                        <!-- Remove item icon -->
+                        <i class="bi bi-trash3 remove-item" data-product-id="<%= item.productId._id %>"></i>
+                    </td>
+                    <td class="align-middle text-center">Rs <span class="total-price">
+                            <%= item.productId.price * item.quantity %>
+                        </span></td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <!-- Total Bill Display -->
+    <div class="bill-div">Total Bill: Rs <span id="totalBill"></span></div>
+    <div class="user-details">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required placeholder="Enter your phone number">
+
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required placeholder="03xx xxxxxxx"></textarea>
+    </div>
+
+    <!-- Checkout Button -->
+    <button id="checkoutButton" class="my-checkout-btn">
+        <i class="bi bi-cart-check-fill mx-1 "></i>
+        Checkout
+    </button>
+</div>
+
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Update totalBill and total price for each product
+        const updateTotalBill = () => {
+            var totalBill = 0;
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+            quantityInputs.forEach(input => {
+                const quantity = parseInt(input.value);
+                const price = parseFloat(input.parentElement.previousElementSibling.textContent.replace('Rs ', ''));
+                totalBill += quantity * price;
+                const totalPriceElement = input.parentElement.nextElementSibling.nextElementSibling.querySelector('.total-price');
+                totalPriceElement.textContent = quantity * price;
+            });
+            document.getElementById('totalBill').textContent = totalBill;
+        };
+
+        // Call updateTotalBill on page load
+        updateTotalBill();
+
+        // Update cart count
+        const updateCartCount = async () => {
+            try {
+                const response = await fetch('/cart/count');
+                const data = await response.json();
+                document.querySelector('.cart-badge').textContent = data.count;
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        };
+
+        // Call updateCartCount on page load
+        updateCartCount();
+
+        // Add event listener to quantity inputs
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', async (event) => {
+                const productId = input.dataset.productId;
+                const quantity = parseInt(input.value);
+
+                try {
+                    const response = await fetch('/cart/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId, quantity })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        updateTotalBill();
+                    } else {
+                        alert('Failed to update cart item');
+                    }
+                } catch (error) {
+                    console.error('Error updating cart item:', error);
+                }
+            });
+        });
+
+        // Add event listener to remove item icons
+        const removeIcons = document.querySelectorAll('.remove-item');
+        removeIcons.forEach(icon => {
+            icon.addEventListener('click', async () => {
+                const productId = icon.dataset.productId;
+
+                try {
+                    const response = await fetch('/cart/remove', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                        row.remove();
+                        updateTotalBill();
+                        updateCartCount();
+                        alert('Item removed from your cart successfully');
+                    } else {
+                        alert('Failed to remove cart item');
+                    }
+                } catch (error) {
+                    console.error('Error removing cart item:', error);
+                }
+            });
+        });
+
+        // Function to construct WhatsApp message URL
+        // Function to construct WhatsApp message URL
+        const getWhatsAppMessageUrl = (cartItemsData, totalBill, phoneNumber, address) => {
+            let message = 'Order details:\n';
+            cartItemsData.forEach(item => {
+                message += `${item.name} - Quantity: ${item.quantity}, Price: Rs ${item.price}\n`;
+            });
+            message += `Total Bill: Rs ${totalBill}\n\n`;
+            message += `Phone Number: ${phoneNumber}\n`;
+            message += `Address: ${address}`;
+            const encodedMessage = encodeURIComponent(message);
+            return `https://api.whatsapp.com/send?phone=923401400510&text=${encodedMessage}`;
+        };
+
+
+        // Add event listener to checkout button
+        document.getElementById('checkoutButton').addEventListener('click', async () => {
+            const cartItems = document.querySelectorAll('.quantity-input');
+            let cartEmpty = true;
+            cartItems.forEach(item => {
+                if (parseInt(item.value) > 0) {
+                    cartEmpty = false;
+                }
+            });
+
+            if (cartEmpty) {
+                alert('Your cart is empty, please add something to cart');
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const cartItemsData = [];
+                quantityInputs.forEach(input => {
+                    const productId = input.dataset.productId;
+                    const quantity = parseInt(input.value);
+                    const price = parseFloat(input.parentElement.previousElementSibling.textContent.replace('Rs ', ''));
+                    const name = input.parentElement.previousElementSibling.previousElementSibling.textContent.trim();
+                    cartItemsData.push({
+                        productId,
+                        quantity,
+                        price,
+                        name
+                    });
+                });
+
+                const phoneNumber = document.getElementById('phoneNumber').value.trim();
+                const address = document.getElementById('address').value.trim();
+
+                const response = await fetch('/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        cartItems: cartItemsData,
+                        phoneNumber,
+                        address
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Checkout successful');
+                    document.getElementById('cartItems').innerHTML = '';
+                    document.getElementById('totalBill').textContent = '0';
+                    // Update cart count after successful checkout
+                    updateCartCount();
+                    // Construct WhatsApp message and open it
+                    // Construct WhatsApp message and open it
+
+                    let totalBill = 0;
+                    cartItemsData.forEach(item => {
+                        totalBill += item.quantity * item.price;
+                    });
+                    const whatsappUrl = getWhatsAppMessageUrl(cartItemsData, totalBill, phoneNumber, address);
+                    const whatsappLink = document.createElement('a');
+                    whatsappLink.href = whatsappUrl;
+                    whatsappLink.target = '_blank';
+                    whatsappLink.click();
+
+                    window.location.href = '/';
+                } else {
+                    if (data.outOfStockItems && data.outOfStockItems.length > 0) {
+                        let message = 'The following items are out of stock:\n';
+                        data.outOfStockItems.forEach(item => {
+                            message += `${item.name} - Available quantity: ${item.available}\n`;
+                        });
+                        alert(message);
+                    } else {
+                        alert('Failed to checkout: ' + data.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error during checkout:', error);
+            }
+        });
+    });
+</script>
+
+
+
+
+<style>
+    .my-checkout-btn {
+        width: 140px;
+        height: 50px;
+        background-color: #0097B2 !important;
+        border-radius: 0px !important;
+        color: white;
+        border: none;
+        font-size: 18px;
+        transition: background-color 0.3s ease !important;
+
+    }
+
+    .my-checkout-btn:hover {
+        background-color: red;
+        transition: background-color 0.3s ease !important;
+
+    }
+
+
+    .bill-div,
+    .checkout-heading {
+        font-size: 30px;
+        font-weight: 700;
+        margin: 30px 0px;
+    }
+
+    .checkout-heading {
+        margin-top: 120px !important;
+    }
+
+    .quantity-input {
+        width: 50px !important;
+    }
+
+    .remove-item {
+        font-size: 22px;
+    }
+
+    #address {
+        /* */
+        width: 400px !important;
+        display: block;
+        background-color: #dcedfc;
+        margin-bottom: 2vw;
+    }
+
+    #phoneNumber {
+        width: 400px !important;
+        display: block;
+        background-color: #dcedfc;
+
+    }
+</style>

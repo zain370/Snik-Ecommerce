@@ -1,0 +1,68 @@
+<link rel="stylesheet" href="/public/styles.css">
+
+<div class="signup-div">
+    <div class="signup-card">
+        <form action="" method="POST">
+            <div class="signup-txt">Login</div>
+
+            <label class="signup-lables" for="email">Email:</label><br>
+            <input type="email" class="signup-email" name="email" required><br><br>
+
+            <label class="signup-lables" for="password">Password:</label><br>
+            <input type="password" class="signup-password" name="password" required><br><br>
+            <% if (typeof errorMessage !== 'undefined') { %>
+                <div class="error-message" style="color:rgb(146, 23, 23);"><%= errorMessage %></div>
+            <% } %>
+            <div>
+                <a class="register-user-text" href="/register">Register Here</a>
+            </div>
+
+            <input id="signup-btn" type="submit" value="Login">
+        </form>
+    </div>
+</div>
+
+<style>
+
+    
+    .signup-name,
+    .signup-email,
+    .signup-password {
+        width: 250px !important;
+        height: 40px !important;
+        margin-top: -5px !important;
+        border-radius: 5px;
+        border: none;
+    }
+
+    #signup-btn {
+        width: 250px;
+        background-color:#2c78eb;
+
+    }
+
+    .signup-lables {
+        margin-top: -10px !important;
+    }
+
+    .signup-card {
+        background-color: #52BAFF;
+        width: 350px;
+        height: 350px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+    .register-user-text{
+        color: rgb(9, 9, 204);
+        font-size: 15px;
+    }
+    .signup-txt{
+        color: white;
+        font-size: 30px;
+        font-weight:700 ;
+        text-align: center;
+    }
+</style>
